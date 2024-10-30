@@ -118,13 +118,13 @@ This project simulates a traffic light system using three LEDs (Red, Yellow, Gre
 - **3 Resistors** (220 ohms or 330 ohms)
 - **Breadboard and Jumper Wires**
 
-## Circuit Connections
+### Circuit Connections
 
 - **Red LED**: Connect the anode (long leg) to digital pin 10 and cathode (short leg) to GND via a 220-ohm resistor.
 - **Yellow LED**: Connect the anode to digital pin 9 and cathode to GND via a 220-ohm resistor.
 - **Green LED**: Connect the anode to digital pin 8 and cathode to GND via a 220-ohm resistor.
 
-## Code
+## #Code
 
 ```cpp
 // Traffic Light Simulation with LEDs
@@ -162,7 +162,7 @@ void loop() {
     delay(2000); // Wait for 2 seconds
     digitalWrite(yellowLED, LOW);
 }
-'''
+```
 
 ---
 ## Day 1: 8 LED Fun
@@ -177,7 +177,7 @@ In this experiment, we'll enhance the previous task by connecting eight LEDs. Th
 - **for() loops**: Useful for repeating a block of code multiple times.
 - **arrays[]**: A collection of variables that can simplify the management of multiple items.
 
-## Code Example
+### Code Example
 ```cpp
 /*     ---------------------------------------------------------
  *  A few Simple LED animations
@@ -211,6 +211,7 @@ void oneAfterAnotherNoLoop() {
 }
 
 // Additional functions for various animations can be added below
+```
 ---
 ## Day 2: _[Project Title Here]_
 
