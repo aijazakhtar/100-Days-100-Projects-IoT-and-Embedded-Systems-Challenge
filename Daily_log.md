@@ -382,7 +382,7 @@ Today, we created a simple game using the Arduino UNO that combines digital inpu
 
 ### Breadboard Wiring Instructions
 
-1. **Digital Input Pin**: Connect the tact switch to digital pin 12 and GND, connect 10K ohm resister between %v and digital pin 12.
+1. **Digital Input Pin**: Connect the tact switch to digital pin 12 and GND, connect 10K ohm resister between 5V and digital pin 12.
 2. **Digital Output Pins**:
    - Connect the anode (long leg) of White LED to pin 2 and cathode (short leg) to GND via a 220-ohm resistor.
    - Connect the anode (long leg) of Yellow LED to pin 3 and cathode (short leg) to GND via a 220-ohm resistor.
@@ -452,6 +452,104 @@ void loop() {
   }
 }
 ```
+### Code Explanation
+- **Setup**: Sets pin 12 as input (for button) and pins 2 to 5 as outputs (for LEDs).
+- **Loop**:
+  - Checks if the button is pressed when the green LED is lit.
+  - Correct guess triggers a success blink on the green LED and increases game speed.
+  - Incorrect guess blinks the current LED without speeding up the game.
+  - Loops through LEDs in the sequence: white -> yellow -> green -> red.
+### How to Play
+- **Objective**: Press the button exactly when the green LED is on.
+- **Scoring**: Each successful press increases the speed, making it more challenging.
+- **Reset**: Press the reset button on the UNO R3 to start over.
+### Key Concepts Covered
+- Using digital input and output pins together.
+- Implementing a game loop and changing speed based on input.
+### Notes
+- This game demonstrates how to use digital I/O in combination to create interactive projects. Experiment with different LED sequences or increase/decrease the difficulty by adjusting delayValue.
+---
+## Day 2: Building a Voltage Meter with Arduino UNO
+
+### Project Overview
+
+Today, we built a basic voltage meter using the analog input on the Arduino UNO. The voltage meter reads the voltage from a voltage divider circuit made with a resistor and a potentiometer, then displays the voltage on the serial monitor.
+
+### Components Needed
+
+- **Arduino UNO**
+- **Breadboard**
+- **1kΩ Potentiometer**
+- **1kΩ Resistor**
+- **Jumper Cables**
+
+### Background Information
+
+The analog input on the UNO reads a voltage range from 0V to 5V and converts it to a digital value between 0 and 1023 using a 10-bit ADC. This gives a resolution of about 4.89mV per unit. Using a 1kΩ resistor and a 1kΩ potentiometer, we created a voltage divider that allows us to feed an adjustable voltage between 0V and 2.5V to the analog input pin A0.
+
+### Voltage Calculation
+
+The voltage at the sensor input can be calculated using the formula:
+
+    V_sensor_input = 5V * (R1 / (R1 + 1kΩ))
+
+where R1 is the resistance set by the potentiometer.
+
+
+### Schematic Diagram
+
+### Breadboard Wiring Instructions
+
+1. **Analog Input**: Connect the middle pin of the potentiometer to analog pin A0 on the UNO.
+2. **Voltage Divider Circuit**:
+   - One side of the potentiometer to ground.
+   - The other side of the potentiometer to 5V through a 1kΩ resistor.
+
+### Code
+
+```cpp
+/*
+  Volt Meter
+*/
+int sensorPin = A0;       // select the analog input pin
+int sensorValue = 0;      // variable to store the value coming from the sensor
+float sensorVoltage = 0;  // variable to store the voltage
+
+void setup() {
+  Serial.begin(9600);     // start serial communication
+}
+
+void loop() {
+  // Read the value from the analog input pin
+  int sensorValue = analogRead(sensorPin);   
+  
+  // Convert sensor value to voltage
+  float sensorVoltage = sensorValue * (5.0 / 1023.0);
+  
+  // Print the voltage
+  Serial.print("The voltage is ");
+  Serial.println(sensorVoltage);
+  
+  // Delay by 1000 milliseconds
+  delay(1000);                 
+}
+```
+### Code Explanation
+- **Setup**: Starts serial communication at 9600 baud for displaying voltage readings.
+- **Loop**:
+  - Reads the analog value from pin A0.
+  - Converts this analog value to voltage.
+  - Prints the voltage reading to the serial monitor.
+  - Delays for 1 second to create a readable update frequency.
+### How to Use
+  - Adjust the potentiometer to vary the voltage at the input.
+  - Observe the voltage change in real-time on the serial monitor.
+### Key Concepts Covered
+  - Using the analog sensor on the Arduino UNO R3.
+  - Building and using a voltage divider circuit with a potentiometer.
+### Notes
+  - This project introduced the basics of analog voltage reading and real-time monitoring using a serial interface. Adjusting the potentiometer allows you to simulate voltage changes, a foundational concept for analog sensor applications.
+
 
 ---
 ## Day 2: _[Project Title Here]_
