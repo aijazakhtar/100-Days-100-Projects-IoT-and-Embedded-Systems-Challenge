@@ -549,8 +549,104 @@ void loop() {
   - Building and using a voltage divider circuit with a potentiometer.
 ### Notes
   - This project introduced the basics of analog voltage reading and real-time monitoring using a serial interface. Adjusting the potentiometer allows you to simulate voltage changes, a foundational concept for analog sensor applications.
+---
+## Day 2 Log: Arduino LED Dice Game 🎲
 
+### Project Overview
+Today’s project was to build an LED dice simulator using the Arduino UNO. By pressing a button, this setup simulates a dice roll, randomly lighting up a number of LEDs (from 1 to 6) to represent the dice number.
 
+### Components Needed
+- **1 x Arduino UNO**
+- **6 x LEDs** (for each dice face)
+- **6 x 220Ω resistors** (for each LED)
+- **1 x Button switch**
+- **1 x 10KΩ resistor** (for button switch)
+- **Jumper cables**
+- **Breadboard**
+
+### Circuit Diagram
+- **LEDs**: Connected to digital pins 2 through 7, each with a 220Ω resistor.
+- **Button**: Connected to digital pin 12 to act as the dice roll trigger and pullup resister between 5V and digital pin 12.
+
+### Code Walkthrough
+
+#### 1. Pin Setup
+```cpp
+int first = 2;
+int second = 3;
+int third = 4;
+int fourth = 5;
+int fifth = 6;
+int sixth = 7;
+int button = 12;
+int pressed = 0;
+
+void setup() {
+  // Initialize LED pins
+  pinMode(2, OUTPUT);
+  pinMode(3, OUTPUT);
+  pinMode(4, OUTPUT);
+  pinMode(5, OUTPUT);
+  pinMode(6, OUTPUT);
+  pinMode(7, OUTPUT);
+
+  // Initialize button pin
+  pinMode(button, INPUT);
+
+  // Set up a random seed from an unconnected analog pin
+  randomSeed(analogRead(0));
+  Serial.begin(9600);
+}
+```
+#### Simulating Tension
+  - To build suspense, the LEDs light up sequentially from left to right and then back.
+```cpp
+void buildUpTension() {
+  for (int i=first; i<=sixth; i++) {
+    if (i!=first) digitalWrite(i-1, LOW);
+    digitalWrite(i, HIGH);
+    delay(100);
+  }
+  for (int i=sixth; i>=first; i--) {
+    if (i!=seventh) digitalWrite(i+1, LOW);
+    digitalWrite(i, HIGH);
+    delay(100);
+  }
+}
+```
+#### Displaying the Dice Roll
+  - A random number between 1 and 6 lights up the corresponding number of LEDs to display the dice result.
+
+```cpp
+void showNumber(int number) {
+  digitalWrite(first, HIGH);
+  if (number >= 2) digitalWrite(second, HIGH);
+  if (number >= 3) digitalWrite(third, HIGH);
+  if (number >= 4) digitalWrite(fourth, HIGH);
+  if (number >= 5) digitalWrite(fifth, HIGH);
+  if (number == 6) digitalWrite(sixth, HIGH);
+}
+```
+#### Dice Roll Logic
+  - If the button is pressed, the dice roll is initiated, building suspense and then displaying a random result.
+
+```cpp
+void loop() {
+  pressed = digitalRead(button);
+  if (pressed == HIGH) {
+    setAllLEDs(LOW);
+    buildUpTension();
+    int thrownNumber = throwDice();
+    showNumber(thrownNumber);
+  }
+}
+```
+### What I Learned
+  - Using digital input/output pins together.
+  - Implementing randomization for simulating a dice throw.
+  - Creating a suspense effect by sequencing LED lights.
+### Next Steps
+  - Try customizing the code by changing LED blink speed or adding different suspense effects before the dice roll.
 ---
 ## Day 2: _[Project Title Here]_
 
