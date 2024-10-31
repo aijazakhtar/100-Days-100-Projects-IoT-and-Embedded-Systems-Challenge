@@ -179,9 +179,9 @@ In this experiment, we'll enhance the previous task by connecting eight LEDs. Th
 
 ### Code Example
 ```cpp
-/*     ---------------------------------------------------------
+/* 
  *  A few Simple LED animations
- */
+  */
 
 // LED Pin Variables
 int ledPins[] = {2, 3, 4, 5, 6, 7, 8, 9}; // Array to hold pin numbers
@@ -194,10 +194,17 @@ void setup() {
 }
 
 void loop() {
-    oneAfterAnotherNoLoop(); // Run the LED animation function
+    oneAfterAnotherNoLoop(); // Runs the LED animation function
+    delay(1000);             // Wait for a second before the next sequence
+    oneAfterAnotherLoop();   // Another LED animation
+    delay(1000);             // Wait for a second before the next sequence
+    oneOnAtATime();         // Turns on one LED at a time
+    delay(1000);             // Wait for a second before the next sequence
+    inAndOut();              // Runs in and out effect
+    delay(1000);             // Wait for a second before restarting
 }
 
-// Function to light up LEDs one after another
+// Function to light up LEDs one after another without looping
 void oneAfterAnotherNoLoop() {
     int delayTime = 100; // Time to pause between LEDs
     for (int i = 0; i < 8; i++) {
@@ -210,7 +217,79 @@ void oneAfterAnotherNoLoop() {
     }
 }
 
-// Additional functions for various animations can be added below
+// Function to light up LEDs one after another using loops
+void oneAfterAnotherLoop() {
+    int delayTime = 100; // Time to pause between LEDs
+
+    // Turn Each LED on one after another
+    for (int i = 0; i <= 7; i++) {
+        digitalWrite(ledPins[i], HIGH);  // Turns on LED #i
+        delay(delayTime);                // Waits for delayTime milliseconds
+    }
+
+    // Turn Each LED off one after another
+    for (int i = 7; i >= 0; i--) {
+        digitalWrite(ledPins[i], LOW);   // Turns off LED #i
+        delay(delayTime);                // Waits for delayTime milliseconds
+    }
+}
+
+// Function to turn on one LED at a time
+void oneOnAtATime() {
+    int delayTime = 100; // Time to pause between LEDs
+
+    for (int i = 0; i <= 7; i++) {
+        int offLED = i - 1;  // Calculate which LED was turned on last time
+        if (i == 0) {         // For i = 0, we turn off LED 7
+            offLED = 7;
+        }
+        digitalWrite(ledPins[i], HIGH);     // Turn on LED #i
+        digitalWrite(ledPins[offLED], LOW); // Turn off the last LED
+        delay(delayTime);
+    }
+}
+
+// Function to create an in-and-out effect with the LEDs
+void inAndOut() {
+    int delayTime = 100; // Time to pause between LEDs
+
+    // Runs the LEDs out from the middle
+    for (int i = 0; i <= 3; i++) {
+        int offLED = i - 1; // Calculate which LED was turned on last time
+        if (i == 0) {
+            offLED = 3; // If i is 0, turn off LED 3
+        }
+        int onLED1 = 3 - i; // First LED to go on
+        int onLED2 = 4 + i; // Second LED to go on
+        int offLED1 = 3 - offLED; // Turn off the LED we turned on last time
+        int offLED2 = 4 + offLED; // Turn off the LED we turned on last time
+
+        digitalWrite(ledPins[onLED1], HIGH);
+        digitalWrite(ledPins[onLED2], HIGH);
+        digitalWrite(ledPins[offLED1], LOW);
+        digitalWrite(ledPins[offLED2], LOW);
+        delay(delayTime);
+    }
+
+    // Runs the LEDs into the middle
+    for (int i = 3; i >= 0; i--) {
+        int offLED = i + 1; // Calculate which LED was turned on last time
+        if (i == 3) {
+            offLED = 0; // If i is 3, turn off LED 0
+        }
+        int onLED1 = 3 - i; // First LED to go on
+        int onLED2 = 4 + i; // Second LED to go on
+        int offLED1 = 3 - offLED; // Turn off the LED we turned on last time
+        int offLED2 = 4 + offLED; // Turn off the LED we turned on last time
+
+        digitalWrite(ledPins[onLED1], HIGH);
+        digitalWrite(ledPins[onLED2], HIGH);
+        digitalWrite(ledPins[offLED1], LOW);
+        digitalWrite(offLED2, LOW);
+        delay(delayTime);
+    }
+}
+
 ```
 ---
 ## Day 2: _[Project Title Here]_
