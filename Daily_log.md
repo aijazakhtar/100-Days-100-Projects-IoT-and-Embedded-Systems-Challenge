@@ -648,6 +648,248 @@ void loop() {
 ### Next Steps
   - Try customizing the code by changing LED blink speed or adding different suspense effects before the dice roll.
 ---
+## Day 2 Log: 10-LED Bar Graph Meter
+
+### Project Overview
+Today’s project involved building a 10-LED bar graph meter using a potentiometer and Arduino UNO. The brightness level of each LED indicates the potentiometer's analog input value, effectively visualizing sensor readings.
+
+### Components Needed
+- **1 x Arduino UNO**
+- **10 x LEDs** (for bar graph display)
+- **10 x 220Ω resistors** (for each LED)
+- **1 x Potentiometer** (for input control)
+- **Breadboard** and **Jumper cables**
+
+### Circuit Diagram
+- **LEDs**: Connected to digital pins 2 through 11, each with a 220Ω resistor.
+- **Potentiometer**: Connected to analog pin A0.and other two pins of potentiometer to 5V and GND.
+
+### Code Walkthrough
+
+#### 1. Pin and Array Setup
+```cpp
+const int analogPin = A0;   // potentiometer connected here
+const int ledCount = 10;    // number of LEDs in the bar graph
+
+int ledPins[] = {2, 3, 4, 5, 6, 7, 8, 9, 10, 11}; // LED pins
+void setup() {
+  for (int thisLed = 0; thisLed < ledCount; thisLed++) {
+    pinMode(ledPins[thisLed], OUTPUT);
+  }
+}
+```
+#### Potentiometer Input to LED Level Mapping
+  - This section reads the potentiometer value and maps it to the LED levels.
+```cpp
+void loop() {
+  int sensorReading = analogRead(analogPin);
+  int ledLevel = map(sensorReading, 0, 1023, 0, ledCount);
+
+  for (int thisLed = 0; thisLed < ledCount; thisLed++) {
+    if (thisLed < ledLevel) {
+      digitalWrite(ledPins[thisLed], HIGH);  // turn on LEDs up to the level
+    } else {
+      digitalWrite(ledPins[thisLed], LOW);   // turn off LEDs beyond the level
+    }
+  }
+}
+```
+### What I Learned
+  - Using an analog input (potentiometer) to control multiple digital outputs (LEDs).
+  - Mapping sensor values to a specific range for bar graph visualization.
+  - Implementing array-based looping for efficient control of multiple LEDs.
+### Next Steps
+  - Explore using different sensors (e.g., a light sensor) in place of the potentiometer for various types of bar graph visualizations.
+---
+## Day 2 Log: Roulette Game with Arduino
+
+### Project Overview
+Today's project involved creating a **Roulette game** using an Arduino and an array of LEDs. This game allows players to set difficulty levels, spin a light "roulette," and try to stop it at the winning LED. A button is used to select difficulty and play the game, with lights indicating game progress and outcomes.
+
+### Components Needed
+- **1 x Arduino UNO**
+- **9 x LEDs** (to form the "roulette" circle)
+- **9 x 220Ω resistors** (one for each LED)
+- **1 x Button** (to control the game)
+- **Breadboard** and **Jumper cables**
+
+### How to Play
+#### Basics of the Game
+The game is inspired by roulette and combines elements of chance and timing. Players set a difficulty level, which controls the speed of the LEDs. Then, they "spin" the LEDs and attempt to stop the movement at the "winning" LED to win the game.
+
+#### Rules to Play
+1. **Choose Difficulty**: Press the button to cycle through difficulty levels, represented by LEDs lighting up one by one.
+   - Each click increases the difficulty (and speed). When the final LED lights up, it resets to the first position.
+2. **Start the Game**: Double-click the button to confirm your difficulty level. The game starts immediately after.
+3. **Spin the LEDs**: The LEDs light up sequentially in a "roulette" motion, moving faster as difficulty increases.
+4. **Stop the Roulette**: Press the button again to try to land on the "winning" LED (the middle LED in the sequence).
+5. **Win or Lose**: 
+   - If the lit LED stops on the middle LED, you win!
+   - If it stops elsewhere, the game ends, and you can try again.
+
+### Code Walkthrough
+
+#### 1. Pin Setup and Variables
+This section initializes the pins for LEDs and the button and sets flags for the game.
+```cpp
+#include <TTBOUNCE.h>   // Button debouncing library
+
+int delay_time = 0;
+const int led_array[9] = {4, 3, 5, 6, 7, 8, 9, 10, 11};
+const int button = 2;
+int difficulty = 0;
+int current_led = 0;
+bool dir_flag = true;   // true goes right, false goes left
+bool game_ended = false;
+bool is_win = false;
+bool is_finished_selecting = false;
+
+TTBOUNCE b = TTBOUNCE(button); // Initialize the button with debounce
+```
+#### 2. Button Clicks for Setting Difficulty and Starting Game
+  - **Single click**: Increases difficulty level (indicated by the LED position).
+  - **Double click**: Starts the game with the chosen difficulty.
+```cpp
+void click(){
+  Serial.print("Click | ");
+  digitalWrite(led_array[difficulty], LOW);
+  difficulty++;
+  if (difficulty > 8) difficulty = 0;
+  digitalWrite(led_array[difficulty], HIGH);
+  Serial.println("Difficulty is: " + String(difficulty));
+  delay(100);
+}
+
+void doubleClick(){
+  Serial.println("Double click");
+  is_finished_selecting = true;
+  delay_time = floor(500 / (difficulty + 1));
+  Serial.println("Difficulty: " + String(delay_time));
+  sweep();
+}
+```
+#### 3. Game Setup and LED Initialization
+  - Sets LED pins to OUTPUT and starts the game with difficulty selection.
+
+```cpp
+void setup() {
+  Serial.begin(9600);
+  b.attachDoubleClick(doubleClick);
+  b.attachClick(click);
+  b.setActiveLow();
+  b.enablePullup();
+
+  for (int i = 0; i < 9; i++) pinMode(led_array[i], OUTPUT);
+
+  sweep();
+  pulse();
+
+  difficulty = 0;
+  digitalWrite(led_array[difficulty], HIGH);
+  while (!is_finished_selecting) b.update();
+  
+  b.update();
+  pinMode(button, INPUT_PULLUP);
+  attachInterrupt(digitalPinToInterrupt(button), button_pressed, FALLING);
+  delay(1000);
+}
+```
+#### 4. Main Game Loop
+  - Moves the lit LED back and forth to simulate a roulette motion. When the button is pressed, it checks if the game has ended and if the player has won.
+
+```cpp
+void loop() {
+  if (!game_ended) {
+    move_led();
+    delay(delay_time);
+  } else if (game_ended) {
+    Serial.println("Game over");
+    if (is_win) {
+      Serial.println("You won!");
+      for (int i = 0; i < 5; i++) {
+        pulse();
+        delay(100);
+      }
+    }
+    sweep();
+    game_ended = false;
+    is_win = false;
+    delay(2000);
+  }
+}
+```
+#### 5. LED Motion, Sweeping, and Pulse Effects
+  - **move_led**: Controls the movement of the lit LED based on direction.
+  - **sweep and pulse:** Create visual effects on the LEDs for game feedback.
+```cpp
+void move_led() { /* Moves the LED based on direction flags */
+  digitalWrite(led_array[current_led], LOW);
+	if(current_led == 8){
+		dir_flag = false;
+		current_led -= 1;
+	}
+	
+	else if(current_led == 0){
+		dir_flag = true;
+		current_led += 1;
+	}
+	
+	else if(dir_flag){
+		current_led += 1;
+	}
+	
+	else if(!dir_flag){
+		current_led -= 1;
+	}
+	digitalWrite(led_array[current_led], HIGH);
+ }
+void pulse() {
+ /* Pulses all LEDs simultaneously */
+for(int i=0; i<9;i++){
+		digitalWrite(led_array[i], HIGH);
+	}
+	
+	delay(100);
+	
+	for(int i=0; i<9;i++){
+		digitalWrite(led_array[i], LOW);
+}
+void sweep() {
+ /* Sweeps the LEDs back and forth */
+for(int i=0; i<9;i++){
+		digitalWrite(led_array[i], HIGH);
+		delay(50);
+		digitalWrite(led_array[i], LOW);
+	}
+	
+	for(int i=8; i>=0;i--){
+		digitalWrite(led_array[i], HIGH);
+		delay(50);
+		digitalWrite(led_array[i], LOW);
+	}
+ }
+void button_pressed(){
+  Serial.println("Button pressed on LED: "+String(current_led));
+	game_ended = true;
+	if(current_led==4){
+		is_win = true;
+	}
+	else if(current_led != 4){
+		is_win = false;
+	}
+ current_led = 0;
+ delay(500);
+}
+
+```
+### What I Learned
+  - Using button debouncing with the TTBOUNCE library for smooth button interactions.
+  - Controlling multiple LEDs with direction flags and sequential lighting.
+  - Programming a simple game loop that adjusts based on user input and game states.
+### Next Steps
+  - Explore adding sound effects or creating a digital display to show the score. Experiment with different LED patterns to enhance the gameplay experience.
+
+---
 ## Day 2: _[Project Title Here]_
 
 **Date**: _[Enter Date Here]_
