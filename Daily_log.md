@@ -292,6 +292,168 @@ void inAndOut() {
 
 ```
 ---
+## Day 2: Using Digital Input with Arduino UNO
+
+### Project Overview
+
+In today's project, we explore how to read a digital input signal using an Arduino UNO and report the signal state via the Serial Monitor. This project covers wiring a tact switch and a pull-up resistor to detect button presses.
+
+### Components Needed
+
+- **Arduino UNO**
+- **Breadboard**
+- **Tact Switch**
+- **10k ohm Resistor**
+- **Jumper Cables**
+
+## Background Information
+
+The digital pins on the Arduino UNO operate at a 5V rating. In this setup:
+- **Logic-1 (HIGH)**: Connected to a 5V power supply through a 10k ohm pull-up resistor.
+- **Logic-0 (LOW)**: Achieved by pressing the tact switch, which shorts the input pin to ground.
+
+By default, when the tact switch is open, the input pin reads **5V**. When pressed, it grounds the pin to **0V**. The 10k ohm resistor limits the current when the switch is pressed, preventing damage to the Arduino.
+
+## Schematic Diagram
+
+
+## Breadboard Wiring Instructions
+
+1. **Connect the 10k ohm Resistor** between the digital pin 12 and the 5V supply.
+2. **Attach the tact switch** so that it connects digital pin 12 to ground when pressed.
+3. **Ensure correct orientation** of the tact switch; otherwise, the signal will always remain grounded.
+
+## Code
+
+```cpp
+/*
+– Digital Input
+*/
+
+const int buttonPin = 12;     // Use digital pin 12 for the button pin
+int buttonState = 0;          // variable for storing the button status
+
+void setup() {
+  // initialize the pushbutton pin as an input:
+  pinMode(buttonPin, INPUT);  
+  // initialize the serial port;
+  Serial.begin(9600);  // start serial for output 
+}
+
+void loop(){
+  // read the state of the pushbutton value:
+  buttonState = digitalRead(buttonPin);
+  
+  // Output button state
+  Serial.print("The button state is ");
+  Serial.println(buttonState);
+  
+  // Delay 1000ms
+  delay(1000);
+} 
+```
+### Expected Output
+-**Default State**: The Serial Monitor should show a buttonState of 1.
+-**Button Pressed**: When the button is pressed, buttonState changes to 0.
+### Key Concepts Covered
+- Using a digital input pin with Arduino
+- Reading and printing digital pin states on the Serial Monitor
+### Notes
+- The 10k ohm resistor ensures only a small current flows from the 5V source when the button is pressed, protecting the circuit components. Adjust the button pin or delay time as desired to customize your setup.
+---
+## Day 2: LED Game with Arduino UNO
+
+### Project Overview
+
+Today, we created a simple game using the Arduino UNO that combines digital input and output pins to control LEDs in sequence. The objective is to stop the LED sequence precisely when the green LED is lit by pressing a button. Each successful attempt increases the game’s speed, enhancing the difficulty level.
+
+### Components Needed
+
+- **Arduino UNO**
+- **Breadboard**
+- **4 LEDs** (White, Yellow, Green, Red)
+- **Resistors**
+  - (appropriate for LEDs or 220 / 330 ohm)
+  - 10K ohm
+- **Jumper Cables**
+- **Tact Switch**
+
+### Schematic Diagram
+
+### Breadboard Wiring Instructions
+
+1. **Digital Input Pin**: Connect the tact switch to digital pin 12 and GND, connect 10K ohm resister between %v and digital pin 12.
+2. **Digital Output Pins**:
+   - Connect the anode (long leg) of White LED to pin 2 and cathode (short leg) to GND via a 220-ohm resistor.
+   - Connect the anode (long leg) of Yellow LED to pin 3 and cathode (short leg) to GND via a 220-ohm resistor.
+   - Connect the anode (long leg) of Green LED to pin 4 and cathode (short leg) to GND via a 220-ohm resistor.
+   - Connect the anode (long leg) of Red LED to pin 5 and cathode (short leg) to GND via a 220-ohm resistor.
+
+### Code
+```cpp
+/*
+  – Digital Input and Output Game
+  In this game, the LED will loop from white, yellow, green, red
+  then back to white. The goal is to press the push button at the exact
+  moment when the green LED is ON. Each time you get it right, the LED
+  will speed up and the difficulty will increase.
+*/
+
+int currentLED = 2;
+int delayValue = 200;
+
+void setup() {
+  // Initialize digital pin 12 as input for the button
+  pinMode(12, INPUT);
+  
+  // Initialize digital pins 2 to 5 as outputs for LEDs
+  pinMode(2, OUTPUT);   // White LED
+  pinMode(3, OUTPUT);   // Yellow LED
+  pinMode(4, OUTPUT);   // Green LED
+  pinMode(5, OUTPUT);   // Red LED
+}
+
+int checkInput() { 
+  return (digitalRead(12) == 0) ? 1 : 0;
+}
+
+void loop() {
+  // Check if the button is pressed at the right moment
+  if (digitalRead(12) == 0) {
+    if (currentLED == 4) {
+      // Blink the correct (green) LED to indicate success
+      for (int i = 0; i < 2; i++) {
+        digitalWrite(4, HIGH);
+        delay(200);
+        digitalWrite(4, LOW);
+        delay(200);
+      }
+      // Speed up the game
+      delayValue -= 20;
+    } else {
+      // Blink the incorrect LED to indicate failure
+      for (int i = 0; i < 2; i++) {
+        digitalWrite(currentLED, HIGH);
+        delay(200);
+        digitalWrite(currentLED, LOW);
+        delay(200);
+      }
+    }
+  }
+
+  // Cycle through the LEDs (white -> yellow -> green -> red)
+  digitalWrite(currentLED, HIGH);
+  delay(delayValue);
+  digitalWrite(currentLED, LOW);
+  delay(delayValue);
+  currentLED++;
+  if (currentLED > 5) {
+    currentLED = 2;
+  }
+}
+```
+
+---
 ## Day 2: _[Project Title Here]_
 
 **Date**: _[Enter Date Here]_
